@@ -1,0 +1,28 @@
+{
+  "name": "memory-conformance",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Behavioral conformance suite for MCP memory servers: does it stay fresh, refuse to guess, and never act alone?",
+  "type": "module",
+  "bin": {
+    "memory-conformance": "./run.ts"
+  },
+  "scripts": {
+    "run": "tsx run.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.24.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  },
+  "license": "MIT",
+  "author": "Ilan Wolberger",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ilanwolberger/memory-conformance"
+  }
+}
