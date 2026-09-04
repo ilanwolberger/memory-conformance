@@ -48,12 +48,20 @@ Exit code is `1` if anything FAILs, `0` otherwise (SKIPs never fail the run) —
 to wire into a CI step. Add `--json` for a machine-readable result instead of the
 table.
 
-For example, against Ogen's own MCP endpoint:
+For example, against Ogen's production endpoint. Ogen hosts a mutable test source for
+the suite, so every probe runs there, none skip. Verified 2026-09-04: 12 of 12 passed.
 
 ```bash
-npx tsx run.ts --url https://ogen.noproduct.com/api/mcp \
-  --header "Authorization: Bearer ogen_sk_..."
+TOKEN=$(node -e "console.log(require('crypto').randomBytes(24).toString('hex'))")
+npx tsx run.ts \
+  --url https://ogen.noproduct.com/api/mcp \
+  --header "Authorization: Bearer ogen_sk_..." \
+  --remote-source "https://ogen.noproduct.com/api/conf-source/$TOKEN"
 ```
+
+`--remote-source <base>` tells the runner to keep its controllable source ON the server
+under test instead of on this machine: the runner PUTs rows to `<base>/<key>`, the server
+reads `<base>/<key>`. Any server can offer the same two-verb contract to be tested the same way.
 
 ## What "conformance" means here
 
