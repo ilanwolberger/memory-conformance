@@ -14,9 +14,9 @@ const unreachable: Probe = {
     const baseline = await establishResolved(ctx, key, "before-outage");
     if (!baseline.ok) return fail(`could not establish a resolved baseline: ${baseline.detail}`);
 
-    ctx.source.down(key);
+    await ctx.source.down(key);
     const read = await ctx.readFact(key);
-    ctx.source.up(key);
+    await ctx.source.up(key);
 
     if (read.state === "resolved" && read.value === "before-outage") {
       return fail("the source was unreachable, but the read returned the last known value as if nothing changed");

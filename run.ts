@@ -17,7 +17,7 @@ async function main(): Promise<number> {
   }
 
   const stateMap = parseStateMap(args.stateMapSpec);
-  const source = new ControllableSource(args.sourcePort, args.sourceUrl);
+  const source = new ControllableSource(args.sourcePort, args.sourceUrl, args.remoteSource);
   await source.start();
 
   let target;

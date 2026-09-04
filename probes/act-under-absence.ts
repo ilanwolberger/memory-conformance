@@ -12,7 +12,7 @@ const actUnderAbsence: Probe = {
     const key = ctx.freshKey("act-under-absence");
 
     if (ctx.hasBindTool) {
-      const url = ctx.source.urlFor(key, []);
+      const url = await ctx.source.urlFor(key, []);
       const bound = await ctx.bind(key, url);
       if (!bound.ok) return fail(`bind failed: ${bound.error ?? "unknown error"}`);
     }

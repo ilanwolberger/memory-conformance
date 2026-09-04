@@ -11,7 +11,7 @@ const freshness: Probe = {
     if (!ctx.hasBindTool) return skip("server exposes no bind tool");
     const key = ctx.freshKey("freshness");
 
-    const url = ctx.source.urlFor(key, [{ value: "first-value" }]);
+    const url = await ctx.source.urlFor(key, [{ value: "first-value" }]);
     const bound = await ctx.bind(key, url);
     if (!bound.ok) return fail(`bind failed: ${bound.error ?? "unknown error"}`);
 
@@ -20,7 +20,7 @@ const freshness: Probe = {
       return fail(`expected the first read to resolve to "first-value"; got state "${read1.rawState ?? read1.state}", value ${JSON.stringify(read1.value)}`);
     }
 
-    ctx.source.setRows(key, [{ value: "second-value" }]);
+    await ctx.source.setRows(key, [{ value: "second-value" }]);
     const read2 = await ctx.readFact(key);
 
     if (read2.state !== "resolved" || read2.value !== "second-value") {

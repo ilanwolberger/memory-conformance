@@ -25,7 +25,7 @@ const honestShape: Probe = {
 
     if (ctx.hasBindTool) {
       const resolvedKey = ctx.freshKey("honest-shape-resolved");
-      const url1 = ctx.source.urlFor(resolvedKey, [{ value: "x" }]);
+      const url1 = await ctx.source.urlFor(resolvedKey, [{ value: "x" }]);
       const bound1 = await ctx.bind(resolvedKey, url1);
       if (bound1.ok) {
         const problem = await checkOneShape(ctx, "resolved", resolvedKey);
@@ -33,7 +33,7 @@ const honestShape: Probe = {
       }
 
       const ambiguousKey = ctx.freshKey("honest-shape-ambiguous");
-      const url2 = ctx.source.urlFor(ambiguousKey, [{ value: "x" }, { value: "y" }]);
+      const url2 = await ctx.source.urlFor(ambiguousKey, [{ value: "x" }, { value: "y" }]);
       const bound2 = await ctx.bind(ambiguousKey, url2);
       if (bound2.ok) {
         const problem = await checkOneShape(ctx, "ambiguous", ambiguousKey);

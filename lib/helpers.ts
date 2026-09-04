@@ -19,7 +19,7 @@ export async function establishResolved(
   key: string,
   value: unknown
 ): Promise<{ ok: true } | { ok: false; detail: string }> {
-  const url = ctx.source.urlFor(key, [{ value }]);
+  const url = await ctx.source.urlFor(key, [{ value }]);
   const bound = await ctx.bind(key, url);
   if (!bound.ok) return { ok: false, detail: `bind failed: ${bound.error ?? "unknown error"}` };
   const read = await ctx.readFact(key);
@@ -37,7 +37,7 @@ export async function establishAmbiguous(
   valueA: unknown,
   valueB: unknown
 ): Promise<{ ok: true } | { ok: false; detail: string }> {
-  const url = ctx.source.urlFor(key, [{ value: valueA }, { value: valueB }]);
+  const url = await ctx.source.urlFor(key, [{ value: valueA }, { value: valueB }]);
   const bound = await ctx.bind(key, url);
   if (!bound.ok) return { ok: false, detail: `bind failed: ${bound.error ?? "unknown error"}` };
   const read = await ctx.readFact(key);

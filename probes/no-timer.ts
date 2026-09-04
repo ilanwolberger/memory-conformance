@@ -12,7 +12,7 @@ const noTimer: Probe = {
     if (!ctx.hasBindTool) return skip("server exposes no bind tool");
     const key = ctx.freshKey("no-timer");
 
-    const url = ctx.source.urlFor(key, [{ value: "before" }]);
+    const url = await ctx.source.urlFor(key, [{ value: "before" }]);
     const bound = await ctx.bind(key, url);
     if (!bound.ok) return fail(`bind failed: ${bound.error ?? "unknown error"}`);
 
@@ -22,7 +22,7 @@ const noTimer: Probe = {
     }
 
     // No delay of any kind here — the point is that a poller with a lag would fail.
-    ctx.source.setRows(key, [{ value: "after" }]);
+    await ctx.source.setRows(key, [{ value: "after" }]);
     const read2 = await ctx.readFact(key);
 
     if (read2.state !== "resolved" || read2.value !== "after") {

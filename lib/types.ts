@@ -91,18 +91,22 @@ export interface ProbeContext {
    *  Throws if no bind tool was found — callers must check `hasBindTool` first. */
   bind: (key: string, url: string) => Promise<{ ok: boolean; error?: string }>;
 
-  /** The controllable local source. Every probe that needs specific data behind a
-   *  key uses this instead of touching the target server's own storage. */
+  /** The controllable source (local by default, or a remote pod-hosted one under
+   *  `--remote-source`). Every probe that needs specific data behind a key uses
+   *  this instead of touching the target server's own storage. Every method is
+   *  async: in remote mode it PUTs to the pod before resolving, so the caller's
+   *  next `bind`/`readFact` can never race ahead of the mutation. */
   source: {
     /** Build the URL that, once bound, serves `rows` for `key`. Registers the rows
-     *  as a side effect. */
-    urlFor: (key: string, rows: unknown[]) => string;
+     *  as a side effect, and — in remote mode — only resolves once that write has
+     *  actually landed. */
+    urlFor: (key: string, rows: unknown[]) => Promise<string>;
     /** Change what a previously-registered key serves, in place — same URL,
      *  different content, for freshness-style probes. */
-    setRows: (key: string, rows: unknown[]) => void;
+    setRows: (key: string, rows: unknown[]) => Promise<void>;
     /** Make the endpoint for `key` fail every request until `up` is called. */
-    down: (key: string) => void;
-    up: (key: string) => void;
+    down: (key: string) => Promise<void>;
+    up: (key: string) => Promise<void>;
   };
 }
 

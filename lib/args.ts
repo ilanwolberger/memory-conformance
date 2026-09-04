@@ -6,6 +6,7 @@ export interface RunArgs {
   bindTool: string;
   sourceUrl: string | undefined;
   sourcePort: number;
+  remoteSource: string | undefined;
   stateMapSpec: string | undefined;
   json: boolean;
   only: string[] | undefined;
@@ -28,6 +29,7 @@ export function parseArgs(argv: string[]): RunArgs {
   let bindTool = DEFAULTS.bindTool;
   let sourceUrl: string | undefined;
   let sourcePort = DEFAULTS.sourcePort;
+  let remoteSource: string | undefined;
   let stateMapSpec: string | undefined;
   let json = false;
   let only: string[] | undefined;
@@ -61,6 +63,9 @@ export function parseArgs(argv: string[]): RunArgs {
       case "--source-port":
         sourcePort = Number(next());
         break;
+      case "--remote-source":
+        remoteSource = next();
+        break;
       case "--state-map":
         stateMapSpec = next();
         break;
@@ -89,7 +94,7 @@ export function parseArgs(argv: string[]): RunArgs {
     throw new Error("--url is required");
   }
 
-  return { url, headers, readTool, actTool, bindTool, sourceUrl, sourcePort, stateMapSpec, json, only, timeoutMs };
+  return { url, headers, readTool, actTool, bindTool, sourceUrl, sourcePort, remoteSource, stateMapSpec, json, only, timeoutMs };
 }
 
 export function printHelp(): void {
@@ -110,6 +115,13 @@ Options:
                           For a remote target, point this at a tunnel forwarding to
                           the local source port (e.g. cloudflared, ngrok).
   --source-port <port>    Port for the local source server (default: random free port)
+  --remote-source <base>  Use a source already hosted next to the target server
+                          instead of one on this machine — the runner PUTs
+                          {rows}/{down:true} to "<base>/<key>" to mutate it, and the
+                          target reads it at the same URL. Use this when the target
+                          cannot reach back to this machine at all, even through a
+                          tunnel (e.g. a hosted pod being tested from a laptop).
+                          Overrides --source-url / --source-port.
   --state-map <spec>      Remap the read result's state field/values, e.g.
                           "field=status,resolved=ok,ambiguous=conflict,unavailable=missing"
   --only <names>          Comma-separated probe names to run (default: all)

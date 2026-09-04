@@ -10,7 +10,7 @@ const ambiguity: Probe = {
   async run(ctx) {
     if (!ctx.hasBindTool) return skip("server exposes no bind tool");
     const key = ctx.freshKey("ambiguity");
-    const url = ctx.source.urlFor(key, [{ value: "candidate-a" }, { value: "candidate-b" }]);
+    const url = await ctx.source.urlFor(key, [{ value: "candidate-a" }, { value: "candidate-b" }]);
     const bound = await ctx.bind(key, url);
     if (!bound.ok) return fail(`bind failed: ${bound.error ?? "unknown error"}`);
 

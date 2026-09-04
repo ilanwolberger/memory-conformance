@@ -10,7 +10,7 @@ const agreement: Probe = {
   async run(ctx) {
     if (!ctx.hasBindTool) return skip("server exposes no bind tool");
     const key = ctx.freshKey("agreement");
-    const url = ctx.source.urlFor(key, [{ value: "same-value" }, { value: "same-value" }]);
+    const url = await ctx.source.urlFor(key, [{ value: "same-value" }, { value: "same-value" }]);
     const bound = await ctx.bind(key, url);
     if (!bound.ok) return fail(`bind failed: ${bound.error ?? "unknown error"}`);
 

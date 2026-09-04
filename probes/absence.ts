@@ -13,7 +13,7 @@ const absence: Probe = {
     // the more direct form of "nothing is here". Otherwise, a key nobody ever
     // bound is itself an honest absence case.
     if (ctx.hasBindTool) {
-      const url = ctx.source.urlFor(key, []);
+      const url = await ctx.source.urlFor(key, []);
       const bound = await ctx.bind(key, url);
       if (!bound.ok) return fail(`bind failed: ${bound.error ?? "unknown error"}`);
     }
