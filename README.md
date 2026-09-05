@@ -54,9 +54,9 @@ the suite, so every probe runs there, none skip. Verified 2026-09-04: 12 of 12 p
 ```bash
 TOKEN=$(node -e "console.log(require('crypto').randomBytes(24).toString('hex'))")
 npx tsx run.ts \
-  --url https://ogen.noproduct.com/api/mcp \
+  --url https://us.ogenhq.com/api/mcp \
   --header "Authorization: Bearer ogen_sk_..." \
-  --remote-source "https://ogen.noproduct.com/api/conf-source/$TOKEN"
+  --remote-source "https://us.ogenhq.com/api/conf-source/$TOKEN"
 ```
 
 `--remote-source <base>` tells the runner to keep its controllable source ON the server
