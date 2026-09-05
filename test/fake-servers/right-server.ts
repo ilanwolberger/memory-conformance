@@ -34,14 +34,14 @@ export function makeRightBehavior(): FakeServerBehavior {
 
     if (rows.length === 0) return { state: "unavailable", reason: "no_rows" };
 
-    const distinct = new Map<string, unknown>();
-    for (const row of rows) distinct.set(JSON.stringify(row.value), row.value);
+    // A fixture, not an implementation: the probes only need a server that
+    // answers "resolved" when every row agrees and "ambiguous" with every
+    // candidate when they do not. Primitive values, plain equality, no scoring.
+    const values: unknown[] = [];
+    for (const row of rows) if (!values.includes(row.value)) values.push(row.value);
 
-    if (distinct.size === 1) return { state: "resolved", value: [...distinct.values()][0] };
-    return {
-      state: "ambiguous",
-      candidates: [...distinct.values()].map((value) => ({ value, confidence: 1 / rows.length })),
-    };
+    if (values.length === 1) return { state: "resolved", value: values[0] };
+    return { state: "ambiguous", candidates: values.map((value) => ({ value })) };
   }
 
   return {
