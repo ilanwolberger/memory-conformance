@@ -21,7 +21,12 @@ const DEFAULTS = {
   timeoutMs: 10_000,
 };
 
-export function parseArgs(argv: string[]): RunArgs {
+/**
+ * `env` defaults to `process.env` and exists as a parameter purely so
+ * tests/args-header-env.test.ts can inject a fake one offline — `--header-env`
+ * itself always resolves against the real process environment in a real run.
+ */
+export function parseArgs(argv: string[], env: NodeJS.ProcessEnv = process.env): RunArgs {
   const headers: Record<string, string> = {};
   let url: string | undefined;
   let readTool = DEFAULTS.readTool;
@@ -46,6 +51,21 @@ export function parseArgs(argv: string[]): RunArgs {
         const raw = next();
         const idx = raw?.indexOf(":") ?? -1;
         if (raw && idx > 0) headers[raw.slice(0, idx).trim()] = raw.slice(idx + 1).trim();
+        break;
+      }
+      case "--header-env": {
+        // Same "Name: value" shape as --header, but the value is read from an
+        // environment variable instead of argv — so a bearer token never shows
+        // up in `ps`/shell history/a process-list snapshot the way a literal
+        // --header "Authorization: Bearer <token>" does. Repeatable, same as
+        // --header; the two can be mixed freely in one run.
+        const varName = next();
+        if (!varName) throw new Error("--header-env requires an environment variable name");
+        const raw = env[varName];
+        if (!raw) throw new Error(`--header-env ${varName}: environment variable is not set (or empty)`);
+        const idx = raw.indexOf(":");
+        if (idx <= 0) throw new Error(`--header-env ${varName}: value must look like "Name: value", got a value with no "Name:" prefix`);
+        headers[raw.slice(0, idx).trim()] = raw.slice(idx + 1).trim();
         break;
       }
       case "--read-tool":
@@ -107,6 +127,11 @@ Usage:
 Options:
   --url <url>            MCP Streamable HTTP endpoint to test (required)
   --header "Name: value"  Extra request header; repeatable
+  --header-env <VAR_NAME>  Extra request header, same "Name: value" shape as
+                          --header, but the value is read from environment
+                          variable VAR_NAME instead of argv — so a secret (a
+                          bearer token) never appears in a process listing or
+                          shell history. Repeatable; freely mixable with --header.
   --read-tool <name>      Live-read tool name (default: recall_live_fact)
   --act-tool <name>       Gated-act tool name (default: commit_gated_action)
   --bind-tool <name>      Source-bind tool name (default: bind_source)

@@ -29,6 +29,14 @@ npx tsx run.ts \
   --bind-tool bind_source
 ```
 
+A bearer token in `--header` is visible to anything that can see this process's
+argument list (a process listing, shell history) for as long as the run takes. Use
+`--header-env VAR_NAME` instead to read the same "Name: value" header from an
+environment variable — `--header-env OGEN_CONF_AUTH` with
+`OGEN_CONF_AUTH="Authorization: Bearer <token>"` exported in the environment reads
+identically to `--header "Authorization: Bearer <token>"`, without the token ever
+appearing in argv. Repeatable, and freely mixable with `--header`.
+
 If your server has no bind tool at all, the runner still works — every probe that
 needs one just SKIPs, with the reason stated plainly.
 
