@@ -106,6 +106,26 @@ result differently than it happened, or handed back stale data. A SKIP means the
 suite couldn't test that property at all (usually: no bind tool, or the tool's
 schema doesn't accept the extra input a probe needed) — it is not a pass.
 
+## Against other memory servers
+
+The suite only asks three things of a server: a keyed live read, a gated action, and
+(optionally) a way to bind a key to a source. Most memory MCPs on the market today are
+stores — they expose add/search/get tools over what was previously written, not a read
+that goes to a live source at call time — so against them nearly every probe SKIPs, and
+the runner says why on each line rather than awarding a pass.
+
+Run 2026-09-08 against the reference `@modelcontextprotocol/server-memory` (bridged to
+Streamable HTTP with `supergateway`, `--read-tool search_nodes --act-tool create_entities`):
+no bind tool, so 9 probes SKIP; `absence` FAILs because the read tool rejects a keyed call
+rather than reporting the key unavailable; `act-under-absence` and `honest-shape` PASS,
+the former because the act call errors instead of running. Hosted servers with a
+Streamable HTTP endpoint (`https://mcp.mem0.ai/mcp`, `https://mcp.supermemory.ai/mcp`)
+need an account token and expose the same add/search shape; point `--header-env` at your
+own token and `--read-tool` at their search tool to see the same picture.
+
+None of this is a defect in those servers — they were not built to make the promise this
+suite checks. It is a way to tell, from the outside, which servers make it.
+
 ## Prove it to yourself
 
 `npm test` runs the suite against two fixtures built for exactly this: one that gets
