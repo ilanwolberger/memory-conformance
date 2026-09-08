@@ -106,6 +106,33 @@ result differently than it happened, or handed back stale data. A SKIP means the
 suite couldn't test that property at all (usually: no bind tool, or the tool's
 schema doesn't accept the extra input a probe needed) — it is not a pass.
 
+## Against other memory servers
+
+The suite only asks three things of a server: a keyed live read, a gated action, and
+(optionally) a way to bind a key to a source. Most memory MCPs on the market today are
+stores — they expose add/search/get tools over what was previously written, not a read
+that goes to a live source at call time — so against them nearly every probe SKIPs, and
+the runner says why on each line rather than awarding a pass.
+
+Run 2026-09-08 against three of them, each with its read tool pointed at its search tool
+and its act tool at its add tool:
+
+| Server | Command shape | Result |
+|---|---|---|
+| `@modelcontextprotocol/server-memory` (reference, bridged to Streamable HTTP with `supergateway`) | `--read-tool search_nodes --act-tool create_entities` | 9 SKIP, 1 FAIL, 2 PASS |
+| Mem0 hosted, `https://mcp.mem0.ai/mcp/` (trailing slash matters — the bare path 307s) | `--header-env <your Bearer token> --read-tool search_memories --act-tool add_memory` | 9 SKIP, 2 FAIL, 1 PASS |
+| Supermemory hosted, `https://mcp.supermemory.ai/mcp` | `--header-env <your Bearer token> --read-tool search_memory --act-tool add_memory` | 9 SKIP, 1 FAIL, 2 PASS |
+
+The nine SKIPs are the same on all three: no bind tool, so nothing can be put behind a key
+and changed. `absence` FAILs on all three the same way: the search tool rejects a keyed
+call rather than reporting the key unavailable. `act-under-absence` PASSes where the add
+tool errors instead of running (reference, Supermemory) and FAILs where the result carries
+no explicit committed/not-committed indication (Mem0). `honest-shape` PASSes on all three
+only because no read could be completed to check.
+
+None of this is a defect in those servers — they were not built to make the promise this
+suite checks. It is a way to tell, from the outside, which servers make it.
+
 ## Prove it to yourself
 
 `npm test` runs the suite against two fixtures built for exactly this: one that gets

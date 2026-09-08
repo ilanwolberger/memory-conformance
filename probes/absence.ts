@@ -19,6 +19,12 @@ const absence: Probe = {
     }
 
     const read = await ctx.readFact(key);
+    if (read.erroredAsProtocolError) {
+      return fail(
+        `the read tool rejected the call instead of answering (${read.errorMessage ?? "error"}) — ` +
+        `a live read must accept a key and report a never-bound key as unavailable`
+      );
+    }
     if (read.state !== "unavailable") {
       return fail(`an absent fact produced state "${read.rawState ?? read.state}" with value ${JSON.stringify(read.value)} instead of unavailable`);
     }
