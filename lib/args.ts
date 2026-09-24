@@ -122,7 +122,7 @@ export function printHelp(): void {
 memory-conformance — behavioral conformance suite for MCP memory servers
 
 Usage:
-  npx tsx run.ts --url <mcp endpoint> [options]
+  npx memory-conformance --url <mcp endpoint> [options]
 
 Options:
   --url <url>            MCP Streamable HTTP endpoint to test (required)

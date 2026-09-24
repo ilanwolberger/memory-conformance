@@ -9,7 +9,13 @@ It only calls the server's tools over MCP and checks what comes back. **This sui
 tests behavior, never mechanism** — every probe here is phrased as what a caller
 must observe, not how a server should be built to produce it.
 
-## Run it in three commands
+## Run it in one command
+
+```bash
+npx memory-conformance --url https://your-server.example.com/mcp
+```
+
+Or from a checkout:
 
 ```bash
 git clone https://github.com/ilanwolberger/memory-conformance && cd memory-conformance

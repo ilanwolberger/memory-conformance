@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# .githooks/pre-push — secret scan only, scoped to the pushed range. THIS FILE IS
+# THE SOURCE; install the live copy into the git common dir (covers every worktree):
+#     cp .githooks/pre-push "$(git rev-parse --git-common-dir)/hooks/pre-push"
+#     chmod +x "$(git rev-parse --git-common-dir)/hooks/pre-push"
+# A leaked secret is irreversible the moment it is pushed, so this runs blocking on
+# every push. Typecheck/tests belong in `npm test`, not here. `--no-verify` bypasses.
+set -uo pipefail
+RED=$'\033[31m'; GRN=$'\033[32m'; DIM=$'\033[2m'; OFF=$'\033[0m'
+fail() { printf '%s\n%s✗ pre-push blocked: %s%s\n' "" "$RED" "$1" "$OFF" >&2; exit 1; }
+note() { printf '%s  %s%s\n' "$DIM" "$1" "$OFF"; }
+ROOT=$(git rev-parse --show-toplevel) || exit 1
+cd "$ROOT" || exit 1
+ZERO=$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')
+if ! command -v gitleaks >/dev/null 2>&1; then
+  fail "gitleaks is not installed, so the secret scan could not run (brew install gitleaks). An unrunnable check is not a passed check."
+fi
+RANGES=()
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  [ -z "${local_sha:-}" ] && continue
+  [ "$local_sha" = "$ZERO" ] && continue
+  if [ "${remote_sha:-$ZERO}" = "$ZERO" ]; then RANGES+=("$local_sha --not --remotes"); else RANGES+=("$remote_sha..$local_sha"); fi
+done
+if [ ${#RANGES[@]} -eq 0 ]; then
+  note "pre-push: nothing to scan"
+else
+  for range in "${RANGES[@]}"; do
+    note "pre-push: gitleaks over $range"
+    # shellcheck disable=SC2086
+    if ! gitleaks git --no-banner --redact --log-opts="$range" . ; then
+      fail "gitleaks found a credential-shaped string in the commits you are pushing. Nothing was pushed. Real secret: rotate it, then rewrite the commit. False positive: scoped allowlist in .gitleaks.toml."
+    fi
+  done
+fi
+printf '%s✓ pre-push: no secrets found%s\n' "$GRN" "$OFF"
