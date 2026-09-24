@@ -5,7 +5,7 @@
   "description": "Behavioral conformance suite for MCP memory servers: does it stay fresh, refuse to guess, and never act alone?",
   "type": "module",
   "bin": {
-    "memory-conformance": "./bin/memory-conformance.mjs"
+    "memory-conformance": "bin/memory-conformance.mjs"
   },
   "scripts": {
     "run": "tsx run.ts",
@@ -23,7 +23,7 @@
   "author": "Ilan Wolberger",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ilanwolberger/memory-conformance"
+    "url": "git+https://github.com/ilanwolberger/memory-conformance.git"
   },
   "files": [
     "bin",
