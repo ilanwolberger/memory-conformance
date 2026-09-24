@@ -63,7 +63,8 @@ to wire into a CI step. Add `--json` for a machine-readable result instead of th
 table.
 
 For example, against Ogen's production endpoint. Ogen hosts a mutable test source for
-the suite, so every probe runs there, none skip. Verified 2026-09-04: 12 of 12 passed.
+the suite, so every probe runs there, none skip. Verified 2026-09-04, and again 2026-09-24 with
+the published npm package: 12 of 12 passed.
 
 ```bash
 TOKEN=$(node -e "console.log(require('crypto').randomBytes(24).toString('hex'))")
