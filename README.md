@@ -151,3 +151,7 @@ on exactly the probes built to catch those defects. A conformance suite that has
 never been shown failing proves nothing about what it actually checks.
 
 Ogen passes all probes; run it yourself.
+
+---
+
+From the same studio: [nittim](https://nittim.com), a security audit for AI-written code that runs inside your coding assistant.
